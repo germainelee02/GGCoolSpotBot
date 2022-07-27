@@ -23,7 +23,7 @@ bot.start((ctx) => {
   );
 });
 
-// just prompts the user to send their location
+// just prompts the user to send their location if the input string is correct
 bot.help((ctx) => {
   ctx.reply(
     "Choose which kind of spots to look for! By pressing one of the commands /restaurant /museum /cafe /shoppingmall"
@@ -31,13 +31,20 @@ bot.help((ctx) => {
 });
 
 bot.on("text", (ctx) => {
-  type = ctx.message.text;
-  if (type != "/shoppingmall") {
-    ctx.reply("Okay! Looking for " + type.substring(1, type.length) + "s...");
-    ctx.reply("Send me your live GPS location to get started!");
+  let str = ctx.message.text;
+  if (str.charAt(0) != "/") {
+    ctx.reply(
+      "Hi fellow human! Are you confused? Press the command /help if you are!"
+    );
   } else {
-    ctx.reply("Okay! Looking for shopping malls...");
-    ctx.reply("Send me your live GPS location to get started!");
+    type = str;
+    if (type != "/shoppingmall") {
+      ctx.reply("Okay! Looking for " + type.substring(1, type.length) + "s...");
+      ctx.reply("Send me your live GPS location to get started!");
+    } else {
+      ctx.reply("Okay! Looking for shopping malls...");
+      ctx.reply("Send me your live GPS location to get started!");
+    }
   }
 });
 
@@ -82,12 +89,6 @@ bot.on("location", (ctx) => {
         console.log(e);
       });
   }
-});
-
-bot.use((ctx) => {
-  ctx.reply(
-    "Hi fellow human! Are you confused? Press the command /help if you are!"
-  );
 });
 
 bot.launch();
