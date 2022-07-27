@@ -1,3 +1,4 @@
 # GGCoolSpotBot
-##### A Telegram Bot
- This bot gathers all the cool spots near you when you send it your live location
+### A telegram bot that helps you find all the cool spots near you
+What kind of spots are you looking for? Restaurants, cafes, museums, or shopping malls? When you send your GPS location to GGCoolSpotBot, it will help 
+you gather all the cool spots in your vicinity!
