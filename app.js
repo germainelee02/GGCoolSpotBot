@@ -3,7 +3,7 @@ const {
   Client,
   PlacesNearbyRanking,
 } = require("@googlemaps/google-maps-services-js");
-const { Telegraf } = require("telegraf");
+const { Telegraf, Markup } = require("telegraf");
 const bot = new Telegraf("5576426748:AAGLIoktXrDmKKjQtMx2A_WyemWI68K0cLM");
 const client = new Client({});
 
@@ -17,35 +17,35 @@ let type = "";
 bot.start((ctx) => {
   ctx.reply(
     "Hello! This is GGCoolSpotBot! I will try to help " +
-      "you find all the cool spots within your current area!" +
-      " What kind of cool spots would you like to find?" +
-      " /restaurant /museum /cafe /shoppingmall"
+      "you find all the cool spots within your current area!"
+  );
+  ctx.reply(
+    "What kind of spots would you like to find?",
+    Markup.keyboard(["restaurant", "cafe", "museum", "shoppingmall"])
+      .oneTime()
+      .resize()
   );
 });
 
-// just prompts the user to send their location if the input string is correct
 bot.help((ctx) => {
   ctx.reply(
-    "Choose which kind of spots to look for! By pressing one of the commands /restaurant /museum /cafe /shoppingmall"
+    "Do choose what kind of spots to look for!",
+    Markup.keyboard(["restaurant", "cafe", "museum", "shoppingmall"])
+      .oneTime()
+      .resize()
   );
 });
 
+// takes in what kind of spot to find, prompts to share location
 bot.on("text", (ctx) => {
   let str = ctx.message.text;
-  if (str.charAt(0) != "/") {
-    ctx.reply(
-      "Hi fellow human! Are you confused? Press the command /help if you are!"
-    );
-  } else {
-    type = str;
-    if (type != "/shoppingmall") {
-      ctx.reply("Okay! Looking for " + type.substring(1, type.length) + "s...");
-      ctx.reply("Send me your live GPS location to get started!");
-    } else {
-      ctx.reply("Okay! Looking for shopping malls...");
-      ctx.reply("Send me your live GPS location to get started!");
-    }
-  }
+  type = str;
+  ctx.reply(
+    "Can I get your location to get started?",
+    Markup.keyboard([Markup.button.locationRequest("Sure! Get my location!")])
+      .oneTime()
+      .resize()
+  );
 });
 
 // when the location is finally sent
@@ -53,42 +53,37 @@ bot.on("location", (ctx) => {
   long = ctx.message.location.longitude;
   lat = ctx.message.location.latitude;
   ctx.reply("Thanks for sending me ur location!");
-  if (type == "") {
-    ctx.reply(
-      "Do select the type of spot you want to search! /restaurant /cafe /museum /shoppingmall"
-    );
-  } else {
-    client
-      .placesNearby({
-        params: {
-          location: { lat: lat, lng: long },
-          key: "AIzaSyAvJ7fWhCOIrXwnQvmGyLAs3dzMdQNDo7g",
-          radius: 500,
-          opennow: true,
-          rankby: PlacesNearbyRanking.prominence, // or prominence also is fine
-          type:
-            type != "/shoppingmall"
-              ? type.substring(1, type.length)
-              : "shopping_mall",
-        },
-        timeout: 1000, // milliseconds
-      })
+  client
+    .placesNearby({
+      params: {
+        location: { lat: lat, lng: long },
+        key: "AIzaSyAvJ7fWhCOIrXwnQvmGyLAs3dzMdQNDo7g",
+        radius: 500,
+        opennow: true,
+        rankby: PlacesNearbyRanking.prominence,
+        type: type != "shoppingmall" ? type : "shopping_mall",
+      },
+      timeout: 1000, // milliseconds
+    })
 
-      .then((r) => {
-        const resultArray = r.data.results;
-        if (resultArray.length == 0) {
-          ctx.reply("Sorry! None found.");
-        }
-        for (let i = 0; i < resultArray.length; i++) {
-          ctx.reply(
-            resultArray[i].name + "\n" + "Address: " + resultArray[i].vicinity
-          );
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
+    .then((r) => {
+      const resultArray = r.data.results;
+      if (resultArray.length == 0) {
+        ctx.reply("Sorry! None found.");
+      }
+      for (let i = 0; i < resultArray.length; i++) {
+        ctx.reply(
+          resultArray[i].name + "\n" + "Address: " + resultArray[i].vicinity
+        );
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 });
 
 bot.launch();
+
+// graceful stop
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
