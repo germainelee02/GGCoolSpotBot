@@ -1,10 +1,10 @@
-// just some imported stuff
+import { bot } from "./tokenkey";
+
 const {
   Client,
   PlacesNearbyRanking,
 } = require("@googlemaps/google-maps-services-js");
 const { Telegraf, Markup } = require("telegraf");
-const bot = new Telegraf("5576426748:AAGLIoktXrDmKKjQtMx2A_WyemWI68K0cLM");
 const client = new Client({});
 
 let long = "";
