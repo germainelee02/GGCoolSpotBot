@@ -1,5 +1,5 @@
-import { bot } from "./tokenkey";
-
+// imports
+const { bot } = require("./tokenkey");
 const {
   Client,
   PlacesNearbyRanking,
