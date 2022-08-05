@@ -1,5 +1,5 @@
 // imports
-const { bot } = require("./tokenkey");
+const { bot, key } = require("./token");
 const {
   Client,
   PlacesNearbyRanking,
@@ -39,13 +39,28 @@ bot.help((ctx) => {
 // takes in what kind of spot to find, prompts to share location
 bot.on("text", (ctx) => {
   let str = ctx.message.text;
-  type = str;
-  ctx.reply(
-    "Can I get your location to get started?",
-    Markup.keyboard([Markup.button.locationRequest("Sure! Get my location!")])
-      .oneTime()
-      .resize()
-  );
+  if (
+    str == "museum" ||
+    str == "restaurant" ||
+    str == "cafe" ||
+    str == "shoppingmall"
+  ) {
+    type = str;
+    ctx.reply(
+      "Can I get your location to get started?",
+      Markup.keyboard([Markup.button.locationRequest("Sure! Get my location!")])
+        .oneTime()
+        .resize()
+    );
+  } else {
+    ctx.reply("Do press the buttons!");
+    ctx.reply(
+      "Do choose what kind of spots to look for!",
+      Markup.keyboard(["restaurant", "cafe", "museum", "shoppingmall"])
+        .oneTime()
+        .resize()
+    );
+  }
 });
 
 // when the location is finally sent
@@ -57,7 +72,7 @@ bot.on("location", (ctx) => {
     .placesNearby({
       params: {
         location: { lat: lat, lng: long },
-        key: "AIzaSyAvJ7fWhCOIrXwnQvmGyLAs3dzMdQNDo7g",
+        key: key,
         radius: 500,
         opennow: true,
         rankby: PlacesNearbyRanking.prominence,
